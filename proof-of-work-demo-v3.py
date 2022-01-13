@@ -2,6 +2,7 @@
 # example of proof-of-work algorithm
 import hashlib
 import time
+import pandas as pd
 
 max_nonce = 2 ** 32  # 4 billion
 
@@ -24,9 +25,15 @@ if __name__ == '__main__':
     nonce = 0
     hash_result = ''
     # difficulty from 0 to 31 bits
+    data_all = []
     for difficulty_bits in range(32):
+        data_row = []
+
         difficulty = 2 ** difficulty_bits
         print("Difficulty: %ld (%d bits)" % (difficulty, difficulty_bits))
+        data_row.append(difficulty)
+        data_row.append(difficulty_bits)
+
         print("Starting search...")
         # checkpoint the current time
         start_time = time.time()
@@ -38,8 +45,22 @@ if __name__ == '__main__':
         # checkpoint how long it took to find a result
         end_time = time.time()
         elapsed_time = end_time - start_time
-        print("Elapsed Time: %.4f seconds" % elapsed_time)
+        print("Elapsed Time: %.5f seconds" % elapsed_time)
+        data_row.append(elapsed_time)
+
         if elapsed_time > 0:
             # estimate the hashes per second
             hash_power = float(int(nonce) / elapsed_time)
             print("Hashing Power: %ld hashes per second" % hash_power)
+            data_row.append(hash_power)
+        else:
+            data_row.append('')
+
+        data_row.append(nonce)
+        data_all.append(data_row)
+
+    # pd.set_option('display.float_format',lambda x : '%.2f' % x)
+    df = pd.DataFrame(data=data_all, columns=['difficulty', 'bits', 'time(seconds)', 'power(hashes/second)', 'nonce'])
+    # df.round({})
+    df['power(hashes/second)'] = df['power(hashes/second)'].map(lambda x: '%d' % x)
+    df.to_csv('result.csv',float_format='%.5f')
