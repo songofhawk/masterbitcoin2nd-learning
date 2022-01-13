@@ -3,18 +3,19 @@
 import hashlib
 import time
 
-max_nonce = 2 ** 32 # 4 billion
+max_nonce = 2 ** 32  # 4 billion
+
 
 def proof_of_work(header, difficulty_bits):
     # calculate the difficulty target
-    target = 2 ** (256-difficulty_bits)
+    target = 2 ** (256 - difficulty_bits)
     for nonce in range(max_nonce):
-        hash_result = hashlib.sha256((str(header)+str(nonce)).encode('utf-8')).hexdigest()
+        hash_result = hashlib.sha256((str(header) + str(nonce)).encode('utf-8')).hexdigest()
         # check if this is a valid result, below the target
         if int(hash_result, 16) < target:
             print("Success with nonce %d" % nonce)
             print("Hash is %s" % hash_result)
-            return (hash_result,nonce)
+            return (hash_result, nonce)
     print("Failed after %d (max_nonce) tries" % nonce)
     return nonce
 
@@ -40,5 +41,5 @@ if __name__ == '__main__':
         print("Elapsed Time: %.4f seconds" % elapsed_time)
         if elapsed_time > 0:
             # estimate the hashes per second
-            hash_power = float(int(nonce)/elapsed_time)
+            hash_power = float(int(nonce) / elapsed_time)
             print("Hashing Power: %ld hashes per second" % hash_power)
